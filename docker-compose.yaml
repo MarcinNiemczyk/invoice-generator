@@ -17,7 +17,7 @@ services:
   app:
     container_name: asgi_uvicorn_dev
     build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8080 --reload
     volumes:
       - .:/app
     ports:
