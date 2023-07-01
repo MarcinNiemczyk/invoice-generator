@@ -1,0 +1,26 @@
+version: '3.8'
+
+name: resume-generator
+
+services:
+
+  db:
+    container_name: psql_database_dev
+    image: postgres:15.2
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+
+  app:
+    container_name: asgi_uvicorn_dev
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8080 --reload
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
