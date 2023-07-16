@@ -7,5 +7,6 @@ engine = create_engine("postgresql+psycopg2://postgres:password@db/postgres", ec
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 class Base(DeclarativeBase):
     pass

@@ -1,9 +1,11 @@
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
-from backend import models, schemas
-from backend.db.engine import SessionLocal, engine
+from backend.auth import model, schema
+from backend.db.engine import SessionLocal, engine, Base
+import uvicorn
 
-models.Base.metadata.create_all(bind=engine)
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -21,9 +23,9 @@ def root():
     return {"Hello": "World"}
 
 
-@app.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = models.User(
+@app.post("/users/", response_model=schema.User)
+def create_user(user: schema.UserCreate, db: Session = Depends(get_db)):
+    db_user = model.User(
         email=user.email,
         password=user.password
     )
@@ -33,7 +35,11 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.get("/users/", response_model=list[schemas.User])
+@app.get("/users/", response_model=list[schema.User])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = db.query(models.User).offset(skip).limit(limit).all()
+    users = db.query(model.User).offset(skip).limit(limit).all()
     return users
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8080)
