@@ -1,8 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
-from backend.db.engine import engine, Base
-from backend.auth import auth
 
+from backend.auth import auth
+from backend.db.engine import Base, engine
 
 Base.metadata.create_all(bind=engine)
 

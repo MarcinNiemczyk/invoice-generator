@@ -1,5 +1,7 @@
-from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
+
+from sqlalchemy.orm import Mapped, mapped_column
+
 from backend.db.engine import Base
 
 
