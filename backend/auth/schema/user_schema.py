@@ -2,15 +2,15 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
 
 
-class UserBase(BaseModel):
-    first_name: Optional[str] = Field(..., max_length=50)
-    last_name: Optional[str] = Field(..., max_length=50)
+class UserCreate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
     email: EmailStr
+    password: str
 
 
-class User(UserBase):
-    pass
-
-
-class UserCreate(UserBase):
+class UserRead(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: EmailStr
     password: str

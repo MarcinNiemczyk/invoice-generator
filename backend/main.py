@@ -1,21 +1,13 @@
-from fastapi import Depends, FastAPI
-from sqlalchemy.orm import Session
-from backend.auth import model, schema
-from backend.db.engine import SessionLocal, engine, Base
 import uvicorn
+from fastapi import FastAPI
+from backend.db.engine import engine, Base
+from backend.auth import auth
 
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.include_router(auth.router)
 
 
 @app.get("/")
@@ -23,23 +15,5 @@ def root():
     return {"Hello": "World"}
 
 
-@app.post("/users/", response_model=schema.User)
-def create_user(user: schema.UserCreate, db: Session = Depends(get_db)):
-    db_user = model.User(
-        email=user.email,
-        password=user.password
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
-@app.get("/users/", response_model=list[schema.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = db.query(model.User).offset(skip).limit(limit).all()
-    return users
-
-
-if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8080)
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)
