@@ -1,13 +1,14 @@
 import uvicorn
 from fastapi import FastAPI
 
-from backend.auth import auth
-from backend.db.engine import Base, engine
+from src.auth.views import auth_router
+from src.db.engine import Base, engine
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-app.include_router(auth.router)
+
+app.include_router(auth_router)
 
 
 @app.get("/")
