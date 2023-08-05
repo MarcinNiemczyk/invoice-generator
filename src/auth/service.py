@@ -14,7 +14,16 @@ def get_password_hash(*, password: str) -> str:
     return pwd_context.hash(password)
 
 
+def validate_email(*, db_session: Session, email: str) -> None:
+    user = db_session.query(User).filter(User.email == email).one_or_none()
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Email already exists"
+        )
+
+
 def create_new_user(*, db_session: Session, user_in: UserRegister) -> None:
+    validate_email(db_session=db_session, email=user_in.email)
     hashed_password = get_password_hash(password=user_in.password)
     user = User(email=user_in.email, password=hashed_password)
     db_session.add(user)
