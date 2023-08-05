@@ -4,8 +4,8 @@ from typing import Optional
 from jose import jwt
 from sqlalchemy.orm import Mapped, mapped_column
 
+from src.config import config, pwd_context
 from src.db.engine import Base
-from src.config import pwd_context, config
 
 
 class User(Base):
@@ -20,7 +20,7 @@ class User(Base):
     @property
     def token(self):
         now = datetime.utcnow()
-        exp = (now + timedelta(seconds=config.ACCESS_TOKEN_EXPIRE_MINUTES)).timestamp()
+        exp = now + timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
         data = {
             "exp": exp,
             "email": self.email,

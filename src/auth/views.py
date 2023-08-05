@@ -1,8 +1,17 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from src.auth.model import User
 from src.auth.schemas import Token, UserLogin, UserRead, UserRegister
-from src.auth.service import create_new_user, get_all_users, get_user_by_email
+from src.auth.service import (
+    create_new_user,
+    get_all_users,
+    get_current_user,
+    get_user_by_email,
+    verify_token,
+)
 from src.db.engine import get_db
 
 auth_router = APIRouter()
@@ -20,7 +29,6 @@ def login(user_in: UserLogin, db_session: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     return {"access_token": user.token}
 
@@ -28,3 +36,13 @@ def login(user_in: UserLogin, db_session: Session = Depends(get_db)):
 @auth_router.get("/users", response_model=list[UserRead])
 def list_users(db_session: Session = Depends(get_db)):
     return get_all_users(db_session=db_session)
+
+
+@auth_router.get("/users/access", dependencies=[Depends(verify_token)])
+def check_token():
+    return {"access": "granted"}
+
+
+@auth_router.get("/users/me", response_model=UserRead)
+def read_current_user(user: Annotated[User, Depends(get_current_user)]):
+    return user

@@ -1,6 +1,6 @@
 import logging
-from passlib.context import CryptContext
 
+from passlib.context import CryptContext
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 log = logging.getLogger(__name__)
