@@ -14,9 +14,16 @@ def get_password_hash(*, password: str) -> str:
     return pwd_context.hash(password)
 
 
+def get_all_users(*, db_session: Session) -> list[User] | list:
+    return db_session.query(User).all()
+
+
+def get_user_by_email(*, db_session: Session, email: str) -> User | None:
+    return db_session.query(User).filter(User.email == email).one_or_none()
+
+
 def validate_email(*, db_session: Session, email: str) -> None:
-    user = db_session.query(User).filter(User.email == email).one_or_none()
-    if user:
+    if get_user_by_email(db_session=db_session, email=email):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Email already exists"
         )
@@ -28,14 +35,6 @@ def create_new_user(*, db_session: Session, user_in: UserRegister) -> None:
     user = User(email=user_in.email, password=hashed_password)
     db_session.add(user)
     db_session.commit()
-
-
-def get_all_users(*, db_session: Session) -> list[User] | list:
-    return db_session.query(User).all()
-
-
-def get_user_by_email(*, db_session: Session, email: str) -> User | None:
-    return db_session.query(User).filter(User.email == email).one_or_none()
 
 
 def verify_token(*, x_token: Annotated[str, Header()]):
